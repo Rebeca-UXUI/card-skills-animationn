@@ -1,48 +1,44 @@
 (() => {
+  // Evita doble init (Webflow)
   if (window.__skillsCardsInit) return;
   window.__skillsCardsInit = true;
 
+  // Respeta reduced motion
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduceMotion) return;
 
   if (!window.gsap || !window.ScrollTrigger) {
-    console.warn("[SkillsCards] GSAP/ScrollTrigger no cargados");
+    console.warn("[SkillsCards] GSAP o ScrollTrigger no cargados");
     return;
   }
 
   gsap.registerPlugin(ScrollTrigger);
 
   const grid = document.querySelector(".u-grid-3");
-  if (!grid) return;
+  if (!grid) {
+    console.warn("[SkillsCards] .u-grid-3 no encontrado");
+    return;
+  }
 
-  const cards = Array.from(grid.querySelectorAll(".card-captabilities-wrapper"));
-  if (!cards.length) return;
+  const cards = grid.querySelectorAll(".card-captabilities-wrapper");
+  if (!cards.length) {
+    console.warn("[SkillsCards] No hay cards");
+    return;
+  }
 
-  // Blur súper mínimo (casi nada) + subida suave
-  gsap.set(cards, {
-    autoAlpha: 0,
-    y: 52,
-    filter: "blur(1px)",
-    willChange: "transform, opacity, filter"
-  });
+  gsap.set(cards, { autoAlpha: 0, y: 40 });
 
   gsap.to(cards, {
     autoAlpha: 1,
     y: 0,
-    filter: "blur(0px)",
-    duration: 0.8,
-    ease: "power3.out",
-    stagger: { each: 0.14, from: "start" },
+    duration: 0.7,
+    ease: "power2.out",
+    stagger: 0.12,
     scrollTrigger: {
       trigger: grid,
-      start: "top 78%",
-      // ✅ NO reverse al subir: solo se reproduce una vez y se queda
-      toggleActions: "play none none none",
-      once: true,
-      invalidateOnRefresh: true
-      // markers: true,
-    },
-    onComplete: () => gsap.set(cards, { willChange: "auto" })
+      start: "top 80%",
+      toggleActions: "play none none none"
+    }
   });
 
   window.addEventListener("load", () => ScrollTrigger.refresh());
